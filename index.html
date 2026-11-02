@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faculty Portal | AttendQr</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --teal-border: #107c65;
+      --card-border: #0f3d3e;
+      --bg-main: #f8fafc;
+      --card-bg: #ffffff;
+      --input-readonly: #e2e8f0;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --border-soft: #e2e8f0;
+      --danger: #ef4444;
+      --success: #10b981;
+      --dark-navy: #0f172a;
+    }
+
+    body.dark-mode {
+      --bg-main: #0f172a;
+      --card-bg: #1e293b;
+      --input-readonly: #334155;
+      --text-dark: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --border-soft: #334155;
+      --primary-light: #1e3a8a;
+      --card-border: #107c65;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { min-height: 100vh; background-color: var(--bg-main); color: var(--text-dark); transition: background-color 0.2s, color 0.2s; }
+
+    .logo-light { display: block; }
+    .logo-dark { display: none; }
+    body.dark-mode .logo-light { display: none; }
+    body.dark-mode .logo-dark { display: block; }
+
+    /* AUTH SCREEN - CENTERED PROFESSIONALLY */
+    #auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 28px; background-color: var(--bg-main); }
+    .auth-split-card { width: 100%; max-width: 920px; min-height: 640px; background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 16px; display: grid; grid-template-columns: 40% 60%; overflow: hidden; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); margin: auto; }
+    .auth-left-panel { background: #0b1120; color: #ffffff; padding: 44px 36px; position: relative; display: flex; flex-direction: column; justify-content: flex-start; overflow: hidden; }
+    .auth-brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .auth-brand-row h2 { font-size: 1.5rem; font-weight: 700; color: #ffffff; }
+    .auth-subtitle { font-size: 0.88rem; color: #cbd5e1; }
+    .auth-shield-watermark { position: absolute; bottom: -35px; right: -25px; width: 240px; height: 240px; opacity: 0.04; pointer-events: none; }
+    
+    .auth-right-panel { background: var(--card-bg); padding: 28px 36px; display: flex; flex-direction: column; overflow-y: auto; max-height: 640px; }
+    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border-soft); margin-bottom: 16px; }
+    .auth-tab-btn { background: transparent; border: none; border-bottom: 2px solid transparent; padding: 8px 0 10px; font-size: 0.88rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
+    .auth-tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .auth-form-pane { display: none; }
+    .auth-form-pane.active { display: block; }
+    .auth-field { margin-bottom: 10px; }
+    .auth-label { display: block; font-size: 0.74rem; font-weight: 600; color: var(--text-muted); margin-bottom: 3px; }
+    .auth-input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.82rem; color: var(--text-dark); background: var(--card-bg); }
+    .auth-submit-btn { width: 100%; background: #0f172a; color: #ffffff; border: none; padding: 10px; border-radius: 7px; font-size: 0.86rem; font-weight: 600; cursor: pointer; margin-top: 4px; }
+    body.dark-mode .auth-submit-btn { background: var(--primary); }
+    .auth-quick-pitch-btn { width: 100%; background: #e0f2fe; color: #0369a1; border: 1px dashed #38bdf8; padding: 7px; border-radius: 7px; font-size: 0.76rem; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+
+    .cursive-send-btn { font-family: 'Caveat', cursive; font-size: 1.1rem; color: #2563eb; background: none; border: none; cursor: pointer; font-weight: 700; margin-left: 6px; }
+    .cursive-send-btn:hover { text-decoration: underline; }
+
+    /* PORTAL SCREEN */
+    #portal-screen { display: none; min-height: 100vh; border: 2px solid var(--teal-border); }
+    .sidebar { width: 245px; background: var(--card-bg); border-right: 1px solid var(--teal-border); display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; }
+    .brand-header { height: 68px; padding: 0 22px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 10px; }
+    .brand-title { font-size: 1.35rem; font-weight: 700; }
+    .profile-mini { padding: 20px 22px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 12px; }
+    .avatar-circle { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #3b82f6; display: flex; align-items: center; justify-content: center; color: #3b82f6; background: var(--primary-light); font-weight: 700; }
+    .nav-menu { padding: 16px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); font-size: 0.9rem; font-weight: 500; cursor: pointer; text-align: left; }
+    .nav-item:hover, .nav-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    #nav-initqr { display: none; border: 1px dashed var(--primary); }
+    .logout-box { padding: 16px; border-top: 1px solid var(--border-soft); }
+    .logout-btn { width: 100%; padding: 10px; border: 1px solid #fca5a5; background: transparent; color: var(--danger); border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    
+    .main-area { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+    .topbar { height: 68px; background: var(--card-bg); border-bottom: 1px solid var(--teal-border); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .topbar h1 { font-size: 1.4rem; font-weight: 700; }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .checked-in-pill { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; padding: 6px 14px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+    .mark-absent-btn { background: #f1f5f9; color: #1e293b; border: none; padding: 7px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+    .icon-action { background: transparent; border: none; font-size: 1.15rem; cursor: pointer; color: var(--text-dark); padding: 6px; border-radius: 6px; }
+    .icon-action:hover { background: var(--border-soft); }
+
+    .workspace { padding: 28px 34px; flex: 1; }
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
+    .framed-card { background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 14px; padding: 26px 28px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(0,0,0,0.02); }
+    .section-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section-top h2 { font-size: 1.15rem; font-weight: 700; }
+    .btn-navy { background: var(--dark-navy); color: #ffffff; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+    .btn-cancel { background: #e2e8f0; color: #1e293b; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-soft); font-size: 0.9rem; }
+    .info-row span:first-child { color: var(--text-muted); font-weight: 500; }
+    .info-row span:last-child { font-weight: 600; }
+    
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 20px; }
+    .stat-box { padding: 18px; border: 1px solid var(--border-soft); border-radius: 10px; background: var(--bg-main); }
+    .stat-box h3 { font-size: 1.6rem; font-weight: 700; color: var(--primary); }
+    .stat-box p { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+
+    .matrix-wrapper { overflow-x: auto; border: 1px solid var(--border-soft); border-radius: 6px; }
+    .matrix-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    .matrix-table th { background: #0f172a; color: #ffffff; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 14px 10px; text-align: center; border-right: 1px solid #1e293b; }
+    .matrix-table td { border: 1px solid var(--border-soft); padding: 14px 8px; text-align: center; font-size: 0.82rem; color: var(--text-muted); height: 68px; vertical-align: middle; }
+    .matrix-table td.time-col { background: #eef7f4; color: #0f172a; font-weight: 700; font-size: 0.78rem; border-right: 2px solid var(--teal-border); width: 110px; }
+    .slot-card { background: #dbeafe; border-left: 3px solid #2563eb; color: #1e293b; padding: 6px 8px; border-radius: 6px; text-align: left; font-size: 0.74rem; cursor: pointer; }
+    .slot-card strong { color: #2563eb; display: block; }
+
+    .form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 18px; }
+    .form-row-4 { display: grid; grid-template-columns: 1fr 2fr; gap: 18px; margin-bottom: 22px; }
+    .field-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    .field-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-main); color: var(--text-dark); font-size: 0.88rem; }
+    .period-clock-combo { display: grid; grid-template-columns: 1fr 110px; gap: 8px; }
+    .readonly-box { background: var(--input-readonly); border: 1px solid var(--border-soft); padding: 11px 14px; border-radius: 8px; font-size: 0.88rem; font-weight: 500; color: var(--text-dark); }
+    
+    .scheduled-box { border: 2px solid var(--card-border); border-radius: 8px; overflow: hidden; background: var(--card-bg); display: none; }
+    .scheduled-header { background: #0f172a; color: #ffffff; padding: 12px 20px; font-size: 0.9rem; font-weight: 600; }
+    .scheduled-table { width: 100%; border-collapse: collapse; }
+    .scheduled-table th { text-align: left; padding: 12px 20px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-soft); }
+    .scheduled-table td { padding: 14px 20px; font-size: 0.88rem; border-bottom: 1px solid var(--border-soft); }
+    .btn-init-qr { background: #0f172a; color: #ffffff; border: none; padding: 7px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+    .btn-delete-row { background: #ef4444; color: #ffffff; border: none; padding: 7px 10px; border-radius: 6px; cursor: pointer; margin-left: 6px; }
+    .empty-schedule-msg { color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 20px; background: var(--bg-main); border-radius: 8px; border: 1px dashed var(--border); }
+
+    .gateway-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .policy-check { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border: 1px solid var(--border-soft); border-radius: 8px; margin-bottom: 10px; font-size: 0.86rem; font-weight: 600; }
+    .policy-check input { width: 16px; height: 16px; accent-color: var(--primary); }
+    .live-qr-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .doomsday-clock { font-family: 'Courier New', Courier, monospace; font-size: 2.8rem; font-weight: 800; letter-spacing: 2px; color: #dc2626; background: #fef2f2; border: 2px dashed #f87171; padding: 8px 24px; border-radius: 12px; margin: 8px 0 16px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.15); }
+    body.dark-mode .doomsday-clock { background: #450a0a; border-color: #ef4444; color: #fca5a5; }
+    .qr-canvas-holder { position: relative; width: 240px; height: 240px; padding: 10px; background: #ffffff; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; border: 1px solid var(--border-soft); }
+    body.dark-mode .qr-canvas-holder { background: #1e293b; border-color: #334155; }
+    .qr-center-badge { position: absolute; width: 52px; height: 52px; background: #ffffff; padding: 3px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
+    body.dark-mode .qr-center-badge { background: #1e293b; }
+    .btn-terminate { width: 100%; background: #ef4444; color: #ffffff; border: none; padding: 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-top: 14px; }
+    .gateway-toast { position: fixed; bottom: 24px; right: 24px; background: var(--card-bg); color: var(--text-dark); border: 1px solid var(--border-soft); padding: 14px 22px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); display: none; align-items: center; gap: 10px; font-size: 0.88rem; font-weight: 600; z-index: 999; }
+  </style>
+</head>
+<body>
+
+  <!-- DUAL THEME LOGOS -->
+  <svg style="display: none;">
+    <symbol id="logo-light-white-bg" viewBox="0 0 100 100">
+      <rect x="2" y="2" width="96" height="96" rx="22" fill="#FFFFFF" stroke="#cbd5e1" stroke-width="3"/>
+      <polygon points="34,19 50,12 66,19 50,27" fill="#1542B6"/>
+      <rect x="18" y="19" width="26" height="26" rx="6" stroke="#1542B6" stroke-width="6" fill="none"/>
+      <rect x="27" y="28" width="8" height="8" rx="2" fill="#1D63DC"/>
+      <rect x="56" y="19" width="26" height="26" rx="6" stroke="#1542B6" stroke-width="6" fill="none"/>
+      <rect x="65" y="28" width="8" height="8" rx="2" fill="#1D63DC"/>
+      <circle cx="50" cy="20" r="2.6" fill="#FFFFFF"/>
+      <rect x="47" y="47" width="6.5" height="6.5" rx="1.5" fill="#2563EB"/>
+      <rect x="18" y="55" width="26" height="26" rx="6" stroke="#1542B6" stroke-width="6" fill="none"/>
+      <rect x="27" y="63" width="3.2" height="10" rx="1.5" fill="#1D63DC"/>
+      <rect x="32.5" y="63" width="3.2" height="10" rx="1.5" fill="#1D63DC"/>
+      <path d="M53 69 L63 79 L84 56" stroke="#1D63DC" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </symbol>
+
+    <symbol id="logo-dark-blue-bg" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#1D63DC"/>
+      <rect x="16" y="16" width="28" height="28" rx="6" stroke="#FFFFFF" stroke-width="6" fill="none"/>
+      <rect x="25" y="25" width="10" height="10" rx="2" fill="#FFFFFF"/>
+      <rect x="56" y="16" width="28" height="28" rx="6" stroke="#FFFFFF" stroke-width="6" fill="none"/>
+      <rect x="65" y="25" width="10" height="10" rx="2" fill="#FFFFFF"/>
+      <rect x="16" y="56" width="28" height="28" rx="6" stroke="#FFFFFF" stroke-width="6" fill="none"/>
+      <rect x="25" y="65" width="10" height="10" rx="2" fill="#FFFFFF"/>
+      <polygon points="50,39 64,46 50,53 36,46" fill="#93C5FD"/>
+      <rect x="54" y="55" width="7" height="7" rx="2" fill="#93C5FD"/>
+      <path d="M52 71 L63 81 L83 59" stroke="#FFFFFF" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </symbol>
+  </svg>
+
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen">
+    <div class="auth-split-card">
+      <div class="auth-left-panel">
+        <div class="auth-brand-row">
+          <svg width="42" height="42"><use href="#logo-dark-blue-bg"></use></svg>
+          <h2>AttendQr</h2>
+        </div>
+        <p class="auth-subtitle">Next-Gen Faculty Attendance System</p>
+        <svg class="auth-shield-watermark" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/>
+        </svg>
+      </div>
+
+      <div class="auth-right-panel">
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab-btn" id="tabBtnLogin" onclick="switchAuthTab('login')">Faculty Login</button>
+          <button type="button" class="auth-tab-btn active" id="tabBtnRegister" onclick="switchAuthTab('register')">Register Now</button>
+        </div>
+
+        <!-- REGISTER NOW WITH CORE DEPT & DEPT/FACULTY SPECIALIZATION DROPDOWN -->
+        <div id="authPaneRegister" class="auth-form-pane active">
+          <form onsubmit="handleRegistration(event)">
+            <div class="auth-field">
+              <label class="auth-label">Faculty Designation <span style="color:red">*</span></label>
+              <select id="regDesignation" class="auth-input" required>
+                <option value="">Select Academic Designation</option>
+                <option value="Dr.">Dr.</option>
+                <option value="Assistant Professor">Assistant Professor</option>
+                <option value="Associate Professor">Associate Professor</option>
+                <option value="Professor">Professor</option>
+              </select>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;" class="auth-field">
+              <div>
+                <label class="auth-label">College Registration ID <span style="color:red">*</span></label>
+                <input type="text" id="regCollegeId" class="auth-input" placeholder="e.g. 0000" required />
+              </div>
+              <div>
+                <label class="auth-label">Faculty ID 🔒</label>
+                <div class="auth-input" style="background:var(--input-readonly); font-weight:600; text-align:center; padding-top:7px;" id="regFrozenId">Frozen (Check Email)</div>
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label class="auth-label">Email Address <span style="color:red">*</span> 
+                <button type="button" class="cursive-send-btn" onclick="sendFacultyEmail()">Send</button>
+              </label>
+              <input type="email" id="regEmail" class="auth-input" placeholder="faculty@attendqr.edu" required />
+            </div>
+
+            <div class="auth-field">
+              <label class="auth-label">Prefix & Name Structure <span style="color:red">*</span></label>
+              <div style="display:grid; grid-template-columns: 85px 1fr 1fr 1fr; gap:6px;">
+                <select id="regPrefix" class="auth-input" required>
+                  <option value="Dr.">Dr.</option>
+                  <option value="Prof.">Prof.</option>
+                  <option value="Mr.">Mr.</option>
+                  <option value="Ms.">Ms.</option>
+                  <option value="Mrs.">Mrs.</option>
+                </select>
+                <input type="text" id="regFirst" class="auth-input" placeholder="First Name *" required />
+                <input type="text" id="regMiddle" class="auth-input" placeholder="Middle" />
+                <input type="text" id="regLast" class="auth-input" placeholder="Last Name *" required />
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label class="auth-label">Core Department / Program <span style="color:red">*</span></label>
+              <select id="regCoreDept" class="auth-input" required>
+                <option value="">Select Core Department</option>
+                <option value="Diploma & Polytechnic Programs">Diploma & Polytechnic Programs</option>
+                <option value="Undergraduate (Bachelor's) Programs">Undergraduate (Bachelor's) Programs</option>
+                <option value="Postgraduate (Master's) Programs">Postgraduate (Master's) Programs</option>
+                <option value="Integrated & Doctoral Programs">Integrated & Doctoral Programs</option>
+                <option value="Management, Commerce & Finance">Management, Commerce & Finance</option>
+                <option value="Pure, Life & Agricultural Sciences">Pure, Life & Agricultural Sciences</option>
+                <option value="Arts, Humanities, Media & Design">Arts, Humanities, Media & Design</option>
+                <option value="Law, Pharmacy, Allied Health & Education">Law, Pharmacy, Allied Health & Education</option>
+              </select>
+            </div>
+
+            <!-- ADDITIONAL DEPT/FACULTY SPECIALIZATION DROPDOWN -->
+            <div class="auth-field">
+              <label class="auth-label">Department / Faculty Specialization <span style="color:red">*</span></label>
+              <select id="regSpecialization" class="auth-input" required>
+                <option value="">Select Specialization / Faculty</option>
+                <optgroup label="1. Computing, IT & Emerging Tech">
+                  <option value="Computer Science & Engineering (CSE)">Computer Science & Engineering (CSE)</option>
+                  <option value="Computer Science & Technology (CST)">Computer Science & Technology (CST)</option>
+                  <option value="Information Technology (IT)">Information Technology (IT)</option>
+                  <option value="Artificial Intelligence & Machine Learning (AI & ML)">Artificial Intelligence & Machine Learning (AI & ML)</option>
+                  <option value="Data Science & Engineering">Data Science & Engineering</option>
+                  <option value="Cybersecurity & Forensics">Cybersecurity & Forensics</option>
+                  <option value="Internet of Things (IoT) & Cyber-Physical Systems">Internet of Things (IoT) & Cyber-Physical Systems</option>
+                  <option value="Robotics & Automation Engineering">Robotics & Automation Engineering</option>
+                </optgroup>
+                <optgroup label="2. Electronics, Electrical & Communication">
+                  <option value="Electronics & Communication Engineering (ECE)">Electronics & Communication Engineering (ECE)</option>
+                  <option value="Electrical Engineering (EE)">Electrical Engineering (EE)</option>
+                  <option value="Electrical & Electronics Engineering (EEE)">Electrical & Electronics Engineering (EEE)</option>
+                  <option value="Applied Electronics & Instrumentation Engineering (AEIE)">Applied Electronics & Instrumentation Engineering (AEIE)</option>
+                  <option value="Microelectronics & VLSI Engineering">Microelectronics & VLSI Engineering</option>
+                </optgroup>
+                <optgroup label="3. Mechanical, Aerospace & Defense">
+                  <option value="Mechanical Engineering (ME)">Mechanical Engineering (ME)</option>
+                  <option value="Aerospace & Aeronautical Engineering">Aerospace & Aeronautical Engineering</option>
+                  <option value="Defense & Armament Technology">Defense & Armament Technology</option>
+                  <option value="Automobile / Automotive Engineering">Automobile / Automotive Engineering</option>
+                  <option value="Marine & Naval Architecture">Marine & Naval Architecture</option>
+                  <option value="Mechatronics Engineering">Mechatronics Engineering</option>
+                  <option value="Production & Industrial Engineering">Production & Industrial Engineering</option>
+                </optgroup>
+                <optgroup label="4. Civil, Chemical, Materials & Specialized">
+                  <option value="Civil Engineering (CE)">Civil Engineering (CE)</option>
+                  <option value="Chemical Engineering">Chemical Engineering</option>
+                  <option value="Metallurgical & Materials Engineering">Metallurgical & Materials Engineering</option>
+                  <option value="Biomedical & Biotechnology Engineering">Biomedical & Biotechnology Engineering</option>
+                  <option value="Agricultural & Food Engineering">Agricultural & Food Engineering</option>
+                  <option value="Environmental Engineering">Environmental Engineering</option>
+                  <option value="Mining & Petroleum Engineering">Mining & Petroleum Engineering</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <button type="submit" class="auth-submit-btn">Submit Registration</button>
+          </form>
+        </div>
+
+        <!-- FACULTY LOGIN -->
+        <div id="authPaneLogin" class="auth-form-pane">
+          <button type="button" class="auth-quick-pitch-btn" onclick="fillPitchCredentials()">
+            ⚡ Quick Fill Pitch Credentials (ID: FAC-892X / Pass: 1234)
+          </button>
+          <form onsubmit="handleLogin(event)">
+            <div class="auth-field">
+              <label class="auth-label">Faculty ID <span style="color:red">*</span></label>
+              <input type="text" id="loginFacultyId" class="auth-input" placeholder="Enter Faculty ID (e.g. FAC-892X)" required />
+            </div>
+            <div class="auth-field">
+              <label class="auth-label">Password <span style="color:red">*</span></label>
+              <input type="password" id="loginPassword" class="auth-input" placeholder="Enter Password" required />
+            </div>
+            <button type="submit" class="auth-submit-btn">Login to Faculty Portal</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PORTAL SCREEN -->
+  <div id="portal-screen">
+    <aside class="sidebar">
+      <div>
+        <div class="brand-header">
+          <svg class="logo-light" width="34" height="34"><use href="#logo-light-white-bg"></use></svg>
+          <svg class="logo-dark" width="34" height="34"><use href="#logo-dark-blue-bg"></use></svg>
+          <span class="brand-title">AttendQr</span>
+        </div>
+
+        <div class="profile-mini">
+          <div class="avatar-circle">👤</div>
+          <div>
+            <h4 id="sidebar-name">Dr. Pitch Demo</h4>
+            <p id="sidebar-dept">Computer Science</p>
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <button class="nav-item active" onclick="openView('dashboard', this)"><span>⊞</span> Dashboard</button>
+          <button class="nav-item" onclick="openView('routine', this)"><span>📅</span> My Routine</button>
+          <button class="nav-item" onclick="openView('addclass', this)"><span>➕</span> Add Class</button>
+          <button class="nav-item" id="nav-initqr" onclick="openView('initqr', this)"><span>⚡</span> Init QR</button>
+          <button class="nav-item" onclick="openView('logs', this)"><span>📄</span> Attendance Logs</button>
+        </nav>
+      </div>
+
+      <div class="logout-box">
+        <button class="logout-btn" onclick="handleLogout()"><span>↪</span> Secure Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <h1 id="topbar-title">Overview Dashboard</h1>
+        <div class="topbar-right">
+          <div class="checked-in-pill">● CHECKED IN</div>
+          <button class="mark-absent-btn">👤× Mark Absent</button>
+          <button class="icon-action" onclick="toggleDarkMode()" id="themeToggleBtn" title="Toggle Light / Dark Mode">🌙</button>
+          <button class="icon-action" title="Notifications">🔔</button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <section id="view-dashboard" class="view-section active">
+          <div class="framed-card">
+            <div class="section-top">
+              <div>
+                <h2 id="greetingTitle">Welcome Back</h2>
+                <p>Verified campus identity and daily attendance gateway status.</p>
+              </div>
+              <button class="btn-navy" onclick="openView('addclass', document.getElementById('nav-addclass'))">+ Schedule a Class</button>
+            </div>
+            <div class="profile-grid">
+              <div>
+                <div class="info-row"><span>Faculty Name</span><span id="prof-name">Dr. Pitch Demo</span></div>
+                <div class="info-row"><span>Email Address</span><span id="prof-email">dr.pitch@attendqr.edu</span></div>
+                <div class="info-row"><span>Department</span><span id="prof-dept">Computer Science</span></div>
+              </div>
+              <div>
+                <div class="info-row"><span>Faculty ID</span><span id="prof-id">FAC-892X</span></div>
+                <div class="info-row"><span>Designation</span><span id="prof-desig">Associate Professor</span></div>
+                <div class="info-row"><span>Current Status</span><span style="color: var(--success);">Checked In</span></div>
+              </div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-box"><h3 id="stat-scheduled">0</h3><p>Classes Scheduled Today</p></div>
+              <div class="stat-box"><h3 id="stat-active-qr">None</h3><p>Active QR Gateway</p></div>
+              <div class="stat-box"><h3 id="stat-logs">0</h3><p>Completed Sessions Logged</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-routine" class="view-section">
+          <div class="framed-card">
+            <div class="section-top">
+              <div>
+                <h2>📅 Master Timetable Matrix (10×10)</h2>
+                <p>Days are arranged left-to-right (Columns) and Time Slots run top-to-bottom (Rows).</p>
+              </div>
+              <button class="btn-navy" onclick="openView('addclass', document.getElementById('nav-addclass'))">+ Manage Routine</button>
+            </div>
+            <div class="matrix-wrapper">
+              <table class="matrix-table">
+                <thead>
+                  <tr>
+                    <th>TIME \ DAYS</th>
+                    <th>MONDAY</th>
+                    <th>TUESDAY</th>
+                    <th>WEDNESDAY</th>
+                    <th>THURSDAY</th>
+                    <th>FRIDAY</th>
+                    <th>SATURDAY</th>
+                    <th>SUNDAY</th>
+                    <th>EXTRA / LAB</th>
+                    <th>MAKE-UP</th>
+                  </tr>
+                </thead>
+                <tbody id="matrix-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-addclass" class="view-section">
+          <div class="framed-card">
+            <div class="section-top">
+              <h2>Weekly Routine Planner</h2>
+              <button class="btn-navy" onclick="document.getElementById('branchSelect').focus()">+ Add Class</button>
+            </div>
+
+            <div class="form-row-3">
+              <div class="field-group">
+                <label>Branch / Program</label>
+                <select id="branchSelect" class="field-control" onchange="onBranchChange()">
+                  <option value="">Select Branch</option>
+                  <option value="B.Tech">B.Tech</option>
+                  <option value="Diploma CST">Diploma CST</option>
+                  <option value="BCA">BCA</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>Semester</label>
+                <select id="semesterSelect" class="field-control" onchange="onSemesterChange()">
+                  <option value="">Select Branch First</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>Subject</label>
+                <select id="subjectSelect" class="field-control">
+                  <option value="">Select Semester First</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row-3">
+              <div class="field-group">
+                <label>How Many Periods</label>
+                <select id="periodCount" class="field-control" onchange="syncPeriodsToTime()">
+                  <option value="1">1 Period</option>
+                  <option value="2" selected>2 Periods</option>
+                  <option value="3">3 Periods</option>
+                  <option value="4">4 Periods</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>Starting Period & Clock Time</label>
+                <div class="period-clock-combo">
+                  <select id="startPeriod" class="field-control" onchange="syncPeriodsToTime()">
+                    <option value="1">P1 (09:00)</option>
+                    <option value="2" selected>P2 (10:00)</option>
+                    <option value="3">P3 (11:00)</option>
+                    <option value="4">P4 (12:00)</option>
+                    <option value="5">P5 (13:00)</option>
+                    <option value="6">P6 (14:00)</option>
+                    <option value="7">P7 (15:00)</option>
+                    <option value="8">P8 (16:00)</option>
+                  </select>
+                  <input type="time" id="startTimeClock" class="field-control" value="10:00" />
+                </div>
+              </div>
+              <div class="field-group">
+                <label>Ending Period & Clock Time</label>
+                <div class="period-clock-combo">
+                  <select id="endPeriod" class="field-control">
+                    <option value="1">P1 (10:00)</option>
+                    <option value="2" selected>P2 (11:00)</option>
+                    <option value="3">P3 (12:00)</option>
+                    <option value="4">P4 (13:00)</option>
+                    <option value="5">P5 (14:00)</option>
+                    <option value="6">P6 (15:00)</option>
+                    <option value="7">P7 (16:00)</option>
+                    <option value="8">P8 (17:00)</option>
+                  </select>
+                  <input type="time" id="endTimeClock" class="field-control" value="11:00" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row-4">
+              <div class="field-group">
+                <label>Date (No Past Dates)</label>
+                <input type="date" id="classDate" class="field-control" />
+              </div>
+              <div class="field-group">
+                <label>Room Number</label>
+                <select id="roomSelect" class="field-control" onchange="toggleCustomRoom()">
+                  <option value="BNB room 302">BNB room 302</option>
+                  <option value="Lab 302">Lab 302</option>
+                  <option value="Room 204">Room 204</option>
+                  <option value="custom">Other (Write Manually)</option>
+                </select>
+                <input type="text" id="customRoomInput" class="field-control" placeholder="Type custom room..." style="margin-top: 8px; display: none;" />
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+              <button class="btn-navy" onclick="saveClassToRoutine()">💾 Save to Routine</button>
+              <button class="btn-cancel" onclick="resetRoutineForm()">Cancel</button>
+            </div>
+          </div>
+
+          <div id="emptyScheduleState" class="empty-schedule-msg">📅<br>No classes scheduled. Add a class above.</div>
+
+          <div id="scheduledTableContainer" class="scheduled-box">
+            <div class="scheduled-header" id="scheduledHeaderTitle">Scheduled Classes</div>
+            <table class="scheduled-table">
+              <thead>
+                <tr>
+                  <th>DATE & TIME</th>
+                  <th>SUBJECT</th>
+                  <th>SEMESTER</th>
+                  <th>PERIODS</th>
+                  <th>ROOM NO</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="scheduledClassesBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="view-initqr" class="view-section">
+          <button class="btn-cancel" style="margin-bottom: 18px;" onclick="openView('addclass', document.getElementById('nav-addclass'))">← Back to Routine</button>
+
+          <div class="gateway-grid">
+            <div class="framed-card">
+              <h2 style="font-size: 1.1rem; margin-bottom: 18px;">⚙️ Session Configuration</h2>
+              <div class="form-row-3" style="grid-template-columns: 1fr 1fr;">
+                <div class="field-group"><label>Branch / Program</label><div class="readonly-box" id="gw-branch">—</div></div>
+                <div class="field-group"><label>Semester</label><div class="readonly-box" id="gw-sem">—</div></div>
+              </div>
+              <div class="form-row-3" style="grid-template-columns: 1fr 1fr;">
+                <div class="field-group"><label>Subject</label><div class="readonly-box" id="gw-subject">—</div></div>
+                <div class="field-group"><label>Room Number</label><div class="readonly-box" id="gw-room">—</div></div>
+              </div>
+              <div class="field-group" style="margin-bottom: 16px;">
+                <label>Scheduled Date & Time Slot</label>
+                <div class="readonly-box" id="gw-datetime">—</div>
+              </div>
+              <div class="form-row-3" style="grid-template-columns: 1fr 1fr; margin-bottom: 16px;">
+                <div class="field-group">
+                  <label>Gateway Validity (Mins)</label>
+                  <input type="number" id="gw-validity" class="field-control" value="5" min="1" max="60" />
+                </div>
+              </div>
+              <label class="policy-check"><input type="checkbox" checked /> Enable Geo-Fencing 📍 (15m Radius)</label>
+              <label class="policy-check"><input type="checkbox" checked /> Dynamic 10s Rotating QR Code</label>
+              <button class="btn-navy" style="width: 100%; justify-content: center; padding: 12px; margin-top: 8px;" onclick="startLiveGateway()">▶ Initialize Gateway</button>
+            </div>
+
+            <div class="framed-card live-qr-panel">
+              <span style="font-size: 0.82rem; font-weight: 600; letter-spacing: 0.8px; color: var(--text-muted);">DOOMSDAY COUNTDOWN CLOCK</span>
+              <div class="doomsday-clock" id="gw-timer">05:00</div>
+
+              <div class="qr-canvas-holder">
+                <canvas id="qrCanvas" width="210" height="210"></canvas>
+                <div class="qr-center-badge">
+                  <svg class="logo-light" width="44" height="44"><use href="#logo-light-white-bg"></use></svg>
+                  <svg class="logo-dark" width="44" height="44"><use href="#logo-dark-blue-bg"></use></svg>
+                </div>
+              </div>
+
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 6px;" id="gw-footer-caption">Click "Initialize Gateway" to start session</p>
+              <p style="font-size: 0.78rem; font-weight: 600; color: var(--primary);">Live Headcount: <span id="gw-headcount">0</span> Scanned</p>
+              <button class="btn-terminate" onclick="terminateGateway()">⏹ Terminate Session</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-logs" class="view-section">
+          <div class="framed-card">
+            <div class="section-top">
+              <div>
+                <h2>Attendance Logs & University Audit</h2>
+                <p>Completed session logs and UGC Excel/PDF exports.</p>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <button class="btn-navy" onclick="exportCleanCSV()">📥 Export UGC CSV</button>
+                <button class="btn-cancel" onclick="window.print()">🖨️ Print PDF</button>
+              </div>
+            </div>
+            <div id="logsEmptyText" class="empty-schedule-msg">📄 No completed sessions logged yet.</div>
+            <table class="scheduled-table" id="logsTable" style="display: none;">
+              <thead>
+                <tr>
+                  <th>DATE & SLOT</th>
+                  <th>SUBJECT</th>
+                  <th>SEMESTER</th>
+                  <th>PERIODS</th>
+                  <th>ROOM</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="gateway-toast" id="gwToast"><span>✔</span> Geo-fenced Gateway Initialized</div>
+
+  <script>
+    document.getElementById('classDate').min = new Date().toISOString().split('T')[0];
+    document.getElementById('classDate').value = new Date().toISOString().split('T')[0];
+
+    function switchAuthTab(tab) {
+      document.getElementById('tabBtnLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('tabBtnRegister').classList.toggle('active', tab === 'register');
+      document.getElementById('authPaneLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('authPaneRegister').classList.toggle('active', tab === 'register');
+    }
+
+    function sendFacultyEmail() {
+      const email = document.getElementById('regEmail').value.trim();
+      if (!email) { alert('Please enter email address.'); return; }
+      document.getElementById('regFrozenId').innerText = 'FAC-892X';
+      alert(`Credentials & Alphanumeric Faculty ID sent to ${email}!\n[Reset Password link included in email simulation]\nID un-frozen as: FAC-892X`);
+    }
+
+    function fillPitchCredentials() {
+      document.getElementById('loginFacultyId').value = 'FAC-892X';
+      document.getElementById('loginPassword').value = '1234';
+    }
+
+    function handleRegistration(e) {
+      e.preventDefault();
+      const regId = document.getElementById('regCollegeId').value.trim();
+      const prefix = document.getElementById('regPrefix').value;
+      const first = document.getElementById('regFirst').value.trim();
+      const last = document.getElementById('regLast').value.trim();
+      const desig = document.getElementById('regDesignation').value;
+      const email = document.getElementById('regEmail').value.trim();
+      const dept = document.getElementById('regSpecialization').value;
+
+      if (regId !== '0000') {
+        alert('For pitching, please use College Registration ID: 0000');
+        return;
+      }
+
+      window.currentUser = {
+        name: `${prefix} ${first} ${last}`.trim(),
+        email: email || 'faculty@attendqr.edu',
+        dept: dept || 'Computer Science & Engineering',
+        designation: desig || 'Assistant Professor',
+        id: 'FAC-892X'
+      };
+
+      alert('Registration Successful! Faculty ID assigned as FAC-892X. Please log in.');
+      switchAuthTab('login');
+      fillPitchCredentials();
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const id = document.getElementById('loginFacultyId').value.trim();
+      const pass = document.getElementById('loginPassword').value.trim();
+
+      if (id !== 'FAC-892X' || pass !== '1234') {
+        alert('Please use Faculty ID: FAC-892X and Password: 1234');
+        return;
+      }
+
+      if (!window.currentUser) {
+        window.currentUser = {
+          name: 'Dr. Pitch Demo',
+          email: 'dr.pitch@attendqr.edu',
+          dept: 'Computer Science & Engineering',
+          designation: 'Associate Professor',
+          id: 'FAC-892X'
+        };
+      }
+
+      updateDashboardProfile(window.currentUser);
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('portal-screen').style.display = 'flex';
+      openView('dashboard', document.getElementById('nav-dashboard'));
+    }
+
+    function updateDashboardProfile(user) {
+      document.getElementById('sidebar-name').innerText = user.name;
+      document.getElementById('sidebar-dept').innerText = user.dept;
+      document.getElementById('prof-name').innerText = user.name;
+      document.getElementById('prof-email').innerText = user.email;
+      document.getElementById('prof-dept').innerText = user.dept;
+      document.getElementById('prof-desig').innerText = user.designation;
+      document.getElementById('prof-id').innerText = user.id;
+
+      const hour = new Date().getHours();
+      let timeGreeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : hour < 21 ? 'Good Evening' : 'Good Night';
+      document.getElementById('greetingTitle').innerText = `${timeGreeting}, ${user.name}!`;
+    }
+
+    function handleLogout() {
+      terminateGateway();
+      document.getElementById('portal-screen').style.display = 'none';
+      document.getElementById('auth-screen').style.display = 'flex';
+    }
+
+    const timeSlots = ['09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '12:00 - 13:00', '13:00 - 14:00', '14:00 - 15:00', '15:00 - 16:00', '16:00 - 17:00', '17:00 - 18:00'];
+    function buildEmptyMatrix() {
+      const tbody = document.getElementById('matrix-body');
+      tbody.innerHTML = '';
+      timeSlots.forEach((slot, rIdx) => {
+        const tr = document.createElement('tr');
+        let html = `<td class="time-col">${slot}</td>`;
+        for (let c = 0; c < 9; c++) html += `<td id="cell-${rIdx}-${c}">—</td>`;
+        tr.innerHTML = html;
+        tbody.appendChild(tr);
+      });
+    }
+    buildEmptyMatrix();
+
+    function openView(viewName, btn) {
+      document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById('view-' + viewName).classList.add('active');
+      if (btn) btn.classList.add('active');
+      const titles = { dashboard: 'Overview Dashboard', routine: 'Overview Dashboard', addclass: 'Routine Planner', initqr: 'Gateway Initialization', logs: 'Attendance Logs' };
+      document.getElementById('topbar-title').innerText = titles[viewName];
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      document.getElementById('themeToggleBtn').innerText = isDark ? '☀️' : '🌙';
+      renderQRMatrix();
+    }
+
+    const deptSubjects = {
+      'B.Tech': ['Advanced Data Structures', 'Design & Analysis of Algorithms', 'Operating Systems', 'Software Engineering'],
+      'Diploma CST': ['Operating System Lab (DCSTC491)', 'Data Structures & Algorithms', 'Computer Networks', 'Python Programming'],
+      'BCA': ['Database Management Systems', 'Object Oriented Programming with C++', 'Web Technology', 'Computer Networks']
+    };
+
+    function onBranchChange() {
+      const branch = document.getElementById('branchSelect').value;
+      const semSelect = document.getElementById('semesterSelect');
+      semSelect.innerHTML = '<option value="">Select Semester</option>';
+      for (let i = 1; i <= 8; i++) semSelect.innerHTML += `<option value="Semester ${i}">Semester ${i}</option>`;
+    }
+
+    function onSemesterChange() {
+      const branch = document.getElementById('branchSelect').value;
+      const subjSelect = document.getElementById('subjectSelect');
+      subjSelect.innerHTML = '';
+      const list = deptSubjects[branch] || ['Physics', 'Mathematics', 'Basic Electronics'];
+      list.forEach(sub => { subjSelect.innerHTML += `<option value="${sub}">${sub}</option>`; });
+    }
+    document.getElementById('semesterSelect').addEventListener('change', onSemesterChange);
+
+    function toggleCustomRoom() {
+      const val = document.getElementById('roomSelect').value;
+      document.getElementById('customRoomInput').style.display = val === 'custom' ? 'block' : 'none';
+    }
+
+    const periodHours = { 1: { start: '09:00', end: '10:00' }, 2: { start: '10:00', end: '11:00' }, 3: { start: '11:00', end: '12:00' }, 4: { start: '12:00', end: '13:00' }, 5: { start: '13:00', end: '14:00' }, 6: { start: '14:00', end: '15:00' }, 7: { start: '15:00', end: '16:00' }, 8: { start: '16:00', end: '17:00' } };
+    function syncPeriodsToTime() {
+      const howMany = parseInt(document.getElementById('periodCount').value, 10);
+      const startP = parseInt(document.getElementById('startPeriod').value, 10);
+      const endP = Math.min(8, startP + howMany - 1);
+      document.getElementById('endPeriod').value = endP;
+      document.getElementById('startTimeClock').value = periodHours[startP].start;
+      document.getElementById('endTimeClock').value = periodHours[endP].end;
+    }
+
+    let scheduledClasses = [];
+    function saveClassToRoutine() {
+      const branch = document.getElementById('branchSelect').value;
+      const sem = document.getElementById('semesterSelect').value;
+      const subject = document.getElementById('subjectSelect').value;
+      if (!branch || !sem || !subject) { alert('Please select Branch, Semester, and Subject before saving.'); return; }
+      
+      const howMany = document.getElementById('periodCount').value;
+      const startP = parseInt(document.getElementById('startPeriod').value, 10);
+      const endP = parseInt(document.getElementById('endPeriod').value, 10);
+      const dateVal = document.getElementById('classDate').value;
+      const startT = document.getElementById('startTimeClock').value;
+      const endT = document.getElementById('endTimeClock').value;
+      const roomSel = document.getElementById('roomSelect').value;
+      const room = roomSel === 'custom' ? (document.getElementById('customRoomInput').value || 'Lab 302') : roomSel;
+
+      const item = { id: Date.now(), branch, sem, subject, howMany, startP, endP, dateVal, startT, endT, room };
+      if (scheduledClasses.some(c => c.dateVal === dateVal && c.startP === startP && c.subject === subject)) {
+        alert('This exact class session is already scheduled.');
+        return;
+      }
+      scheduledClasses.push(item);
+      renderScheduledClasses();
+      plotClassOnMatrix(item);
+      document.getElementById('stat-scheduled').innerText = scheduledClasses.length;
+    }
+
+    function renderScheduledClasses() {
+      const emptyState = document.getElementById('emptyScheduleState');
+      const container = document.getElementById('scheduledTableContainer');
+      const tbody = document.getElementById('scheduledClassesBody');
+      if (scheduledClasses.length === 0) { emptyState.style.display = 'block'; container.style.display = 'none'; return; }
+      emptyState.style.display = 'none'; container.style.display = 'block';
+      tbody.innerHTML = '';
+      scheduledClasses.forEach(c => {
+        tbody.innerHTML += `<tr><td>📅 ${c.dateVal}<br>🕒 ${c.startT}-${c.endT}</td><td><strong>${c.subject}</strong></td><td>${c.sem}</td><td>${c.howMany} Period(s)</td><td style="color:var(--primary);font-weight:600;">${c.room}</td><td><button class="btn-init-qr" onclick="triggerInitQR(${c.id})">⚡ Init QR</button><button class="btn-delete-row" onclick="deleteClass(${c.id})">🗑️</button></td></tr>`;
+      });
+    }
+
+    function plotClassOnMatrix(c) {
+      const rowIdx = Math.max(0, Math.min(8, c.startP - 1));
+      const cell = document.getElementById(`cell-${rowIdx}-2`);
+      if (cell) cell.innerHTML = `<div class="slot-card" onclick="triggerInitQR(${c.id})"><strong>${c.subject}</strong>${c.branch}<br>🚪 ${c.room}</div>`;
+    }
+
+    function deleteClass(id) {
+      scheduledClasses = scheduledClasses.filter(c => c.id !== id);
+      renderScheduledClasses();
+      buildEmptyMatrix();
+      scheduledClasses.forEach(plotClassOnMatrix);
+      document.getElementById('stat-scheduled').innerText = scheduledClasses.length;
+    }
+
+    function resetRoutineForm() { document.getElementById('branchSelect').value = ''; onBranchChange(); }
+
+    let activeGatewayClass = null, countdownInterval = null, qrRotateInterval = null;
+    function triggerInitQR(classId) {
+      const found = scheduledClasses.find(c => c.id === classId);
+      if (!found) return;
+      activeGatewayClass = found;
+      const navInitQr = document.getElementById('nav-initqr');
+      navInitQr.style.display = 'flex';
+      document.getElementById('gw-branch').innerText = found.branch;
+      document.getElementById('gw-sem').innerText = found.sem;
+      document.getElementById('gw-subject').innerText = found.subject;
+      document.getElementById('gw-room').innerText = found.room;
+      document.getElementById('gw-datetime').innerText = `${found.dateVal} (${found.startT} - ${found.endT})`;
+      document.getElementById('gw-footer-caption').innerText = `${found.subject} | ${found.room}`;
+      openView('initqr', navInitQr);
+      renderQRMatrix();
+    }
+
+    function renderQRMatrix() {
+      const canvas = document.getElementById('qrCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const isDark = document.body.classList.contains('dark-mode');
+      ctx.fillStyle = isDark ? '#1d63dc' : '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const cells = 25, size = canvas.width / cells;
+      ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
+      for (let r = 0; r < cells; r++) {
+        for (let c = 0; c < cells; c++) {
+          const isCorner = (r < 7 && c < 7) || (r < 7 && c > cells - 8) || (r > cells - 8 && c < 7);
+          const isCenterLogo = (r >= 9 && r <= 15 && c >= 9 && c <= 15);
+          if (!isCorner && !isCenterLogo && Math.random() > 0.46) ctx.fillRect(c * size, r * size, size - 0.8, size - 0.8);
+        }
+      }
+      function drawFinder(x, y) {
+        ctx.strokeStyle = isDark ? '#ffffff' : '#0f172a'; ctx.lineWidth = 3;
+        ctx.strokeRect(x * size + 2, y * size + 2, size * 6 - 4, size * 6 - 4);
+        ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
+        ctx.fillRect((x + 1.5) * size, (y + 1.5) * size, size * 3, size * 3);
+      }
+      drawFinder(0, 0); drawFinder(cells - 7, 0); drawFinder(0, cells - 7);
+    }
+
+    function startLiveGateway() {
+      clearInterval(countdownInterval); clearInterval(qrRotateInterval);
+      let secondsLeft = parseInt(document.getElementById('gw-validity').value || 5, 10) * 60;
+      const toast = document.getElementById('gwToast'); toast.style.display = 'flex';
+      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+      document.getElementById('stat-active-qr').innerText = activeGatewayClass ? activeGatewayClass.subject : 'Active';
+
+      if (activeGatewayClass) {
+        document.getElementById('logsEmptyText').style.display = 'none';
+        const logsTable = document.getElementById('logsTable'); logsTable.style.display = 'table';
+        document.getElementById('logsTableBody').insertAdjacentHTML('afterbegin', `<tr><td>${activeGatewayClass.dateVal}</td><td><strong>${activeGatewayClass.subject}</strong></td><td>${activeGatewayClass.sem}</td><td>${activeGatewayClass.howMany} Period(s)</td><td>${activeGatewayClass.room}</td><td style="color:var(--success);font-weight:600;">Active</td></tr>`);
+        document.getElementById('stat-logs').innerText = document.getElementById('logsTableBody').children.length;
+      }
+
+      countdownInterval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft <= 0) { terminateGateway(); return; }
+        document.getElementById('gw-timer').innerText = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
+      }, 1000);
+      qrRotateInterval = setInterval(renderQRMatrix, 10000);
+    }
+
+    function terminateGateway() { clearInterval(countdownInterval); clearInterval(qrRotateInterval); document.getElementById('gw-timer').innerText = '00:00'; document.getElementById('stat-active-qr').innerText = 'None'; }
+
+    function exportCleanCSV() {
+      if (scheduledClasses.length === 0) { alert('No sessions recorded.'); return; }
+      let csv = 'Date,Start,End,Branch,Sem,Subject,Periods,Room\n';
+      scheduledClasses.forEach(c => { csv += `${c.dateVal},${c.startT},${c.endT},${c.branch},${c.sem},${c.subject},${c.howMany},${c.room}\n`; });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'Audit_Report.csv'; a.click();
+    }
+  </script>
+</body>
+</html>
